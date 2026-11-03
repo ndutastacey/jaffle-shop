@@ -1,0 +1,41 @@
+models:
+  - name: location_monthly_revenue
+    description: >
+      One row per store per month, with orders, revenue, supply cost and gross profit.
+      Feeds the owner and store manager dashboards.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - location_id
+              - revenue_month
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "order_count > 0 and revenue >= 0"
+    columns:
+      - name: location_id
+        description: The store. Matches location_id in locations.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('locations')
+                field: location_id
+      - name: location_name
+        description: The store's name.
+        data_tests:
+          - not_null
+      - name: revenue_month
+        description: The first day of the month the orders were placed in.
+        data_tests:
+          - not_null
+      - name: order_count
+        description: Number of orders that store took that month.
+      - name: revenue
+        description: Sum of order totals (including tax), in dollars.
+      - name: supply_cost
+        description: What the supplies for those orders cost.
+      - name: gross_profit
+        description: Revenue minus supply cost.
+      - name: avg_order_value
+        description: Revenue divided by number of orders.
