@@ -93,3 +93,11 @@ body {
   color: var(--muted);
 }
 .error { color: #b91c1c; }
+
+.freshness { color: var(--muted); font-size: 0.8rem; margin-top: 6px; }
+
+.warning {
+  color: #92400e;
+  border-color: #f59e0b;
+  border-style: solid;
+}

@@ -39,3 +39,7 @@ models:
         description: Revenue minus supply cost.
       - name: avg_order_value
         description: Revenue divided by number of orders.
+      - name: built_at
+        description: When dbt last rebuilt this table (UTC). Shown on the dashboard as "Data last updated".
+        data_tests:
+          - not_null

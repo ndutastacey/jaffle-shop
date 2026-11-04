@@ -8,6 +8,7 @@ export type MonthlyRow = {
   revenue: number;
   gross_profit: number;
   avg_order_value: number;
+  built_at: string;
 };
 
 export type Store = {

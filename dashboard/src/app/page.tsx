@@ -6,6 +6,8 @@ import KpiCards from "@/components/KpiCards";
 import RevenueLineChart from "@/components/RevenueLineChart";
 import SimpleBarChart from "@/components/SimpleBarChart";
 
+const STALE_AFTER_HOURS = 24;
+
 export default function DashboardPage() {
   const [role, setRole] = useState<Role>("owner");
   const [stores, setStores] = useState<Store[]>([]);
@@ -13,6 +15,8 @@ export default function DashboardPage() {
   const [rows, setRows] = useState<MonthlyRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [builtAt, setBuiltAt] = useState("");
+  const [stale, setStale] = useState(false);
 
   useEffect(() => {
     fetch("/api/locations")
@@ -35,7 +39,12 @@ export default function DashboardPage() {
         if (!res.ok) throw new Error((await res.json()).error);
         return res.json();
       })
-      .then((data: MonthlyRow[]) => setRows(data))
+      .then((data: MonthlyRow[]) => {
+        setRows(data);
+        const built = data[0]?.built_at ?? "";
+        setBuiltAt(built);
+        setStale(built ? Date.now() - Date.parse(built) > STALE_AFTER_HOURS * 60 * 60 * 1000 : false);
+      })
       .catch((e: Error) => setError(e.message))
       .finally(() => setLoading(false));
   }, [role, storeId]);
@@ -73,8 +82,18 @@ export default function DashboardPage() {
     }))
     .sort((a, b) => b.value - a.value);
 
-
   const ordersByMonth = rows.map((r) => ({ label: r.month, value: r.order_count }));
+
+  const builtLabel = builtAt
+    ? new Date(builtAt).toLocaleString("en-GB", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        timeZone: "Africa/Nairobi",
+      })
+    : "";
 
   return (
     <main className="page">
@@ -84,6 +103,7 @@ export default function DashboardPage() {
           <p className="subtitle">
             {role === "owner" ? "All stores · monthly performance" : `${storeName} · monthly performance`}
           </p>
+          {builtLabel && <p className="freshness">Data last updated: {builtLabel} (EAT)</p>}
         </div>
 
         <div className="controls">
@@ -110,6 +130,11 @@ export default function DashboardPage() {
         </div>
       </header>
 
+      {stale && !loading && (
+        <p className="notice warning">
+          This data hasn&apos;t been refreshed in over {STALE_AFTER_HOURS} hours and may be out of date.
+        </p>
+      )}
       {error && <p className="notice error">{error}</p>}
       {loading && !error && <p className="notice">Loading…</p>}
       {!loading && !error && rows.length === 0 && (

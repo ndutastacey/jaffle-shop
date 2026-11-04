@@ -34,7 +34,8 @@ select
     monthly.revenue,
     monthly.supply_cost,
     monthly.revenue - monthly.supply_cost as gross_profit,
-    round(safe_divide(monthly.revenue, monthly.order_count), 2) as avg_order_value
+    round(safe_divide(monthly.revenue, monthly.order_count), 2) as avg_order_value,
+    current_timestamp() as built_at
 
 from monthly
 left join locations

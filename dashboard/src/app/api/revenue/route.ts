@@ -31,7 +31,8 @@ export async function GET(request: NextRequest) {
       order_count,
       cast(revenue as float64) as revenue,
       cast(gross_profit as float64) as gross_profit,
-      cast(avg_order_value as float64) as avg_order_value
+      cast(avg_order_value as float64) as avg_order_value,
+      format_timestamp('%Y-%m-%dT%H:%M:%SZ', built_at) as built_at
     from ${table("location_monthly_revenue")}
     ${where}
     order by month, location_name
