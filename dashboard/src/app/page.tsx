@@ -130,11 +130,7 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      {stale && !loading && (
-        <p className="notice warning">
-          This data hasn&apos;t been refreshed in over {STALE_AFTER_HOURS} hours and may be out of date.
-        </p>
-      )}
+
       {error && <p className="notice error">{error}</p>}
       {loading && !error && <p className="notice">Loading…</p>}
       {!loading && !error && rows.length === 0 && (
